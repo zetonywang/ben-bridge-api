@@ -25,7 +25,7 @@ RUN pip install --no-cache-dir \
     pydantic==2.5.0
 
 # Copy API file
-COPY ben_api.py /app/ben/ben_api.py
+COPY ben_api_cloud.py /app/ben/ben_api_cloud.py
 
 # Set working directory
 WORKDIR /app/ben
@@ -38,4 +38,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
 
 # Start the API
-CMD ["uvicorn", "ben_api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "ben_api_cloud:app", "--host", "0.0.0.0", "--port", "8000"]
