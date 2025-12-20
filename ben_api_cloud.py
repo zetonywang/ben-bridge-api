@@ -1,5 +1,5 @@
 """
-FastAPI server for Ben Bridge Bidding Engine - FIXED Config Path
+FastAPI server for Ben Bridge Bidding Engine - FINAL FIX
 """
 
 from fastapi import FastAPI, HTTPException
@@ -45,38 +45,15 @@ async def lifespan(app: FastAPI):
         
         BotBid = BB
         
-        # Try multiple config paths
-        config_paths = [
-            'config/default.conf',
-            'src/config/default.conf',
-            '/app/ben/config/default.conf',
-            '/app/ben/src/config/default.conf',
-        ]
+        # Use ABSOLUTE path for config
+        config_path = os.path.join(ben_path, 'src', 'config', 'default.conf')
         
-        config_path = None
-        for path in config_paths:
-            full_path = os.path.join(ben_path, path) if not os.path.isabs(path) else path
-            logger.info(f"Trying config path: {full_path}")
-            if os.path.exists(full_path):
-                config_path = path if not os.path.isabs(path) else full_path
-                logger.info(f"✅ Found config at: {full_path}")
-                break
-        
-        if not config_path:
-            # List what's actually in the ben directory
-            logger.error(f"Config not found. Ben directory contents:")
-            for root, dirs, files in os.walk(ben_path):
-                level = root.replace(ben_path, '').count(os.sep)
-                indent = ' ' * 2 * level
-                logger.error(f'{indent}{os.path.basename(root)}/')
-                subindent = ' ' * 2 * (level + 1)
-                for file in files[:10]:  # First 10 files
-                    logger.error(f'{subindent}{file}')
-                if level > 2:  # Don't go too deep
-                    break
-            raise RuntimeError("Config file not found in any expected location")
+        if not os.path.exists(config_path):
+            raise RuntimeError(f"Config not found at {config_path}")
         
         logger.info(f"📋 Loading config from: {config_path}")
+        
+        # Pass absolute path to conf.load
         conf_obj = conf.load(config_path)
         
         logger.info("🧠 Loading neural network models...")
@@ -103,7 +80,7 @@ async def lifespan(app: FastAPI):
     logger.info("🔴 Shutting down...")
 
 
-app = FastAPI(title="Ben Bridge Bidding API", version="3.1.0", lifespan=lifespan)
+app = FastAPI(title="Ben Bridge Bidding API", version="4.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
