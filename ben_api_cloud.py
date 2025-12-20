@@ -57,7 +57,9 @@ async def lifespan(app: FastAPI):
         conf_obj = conf.load(config_path)
         
         logger.info("🧠 Loading neural network models...")
-        models = Models.from_conf(conf_obj, '..')
+        # Use '.' as base path since models are in /app/ben/models/
+        # NOT '..' which would look in /app/models/
+        models = Models.from_conf(conf_obj, '.')
         sampler = Sample.from_conf(conf_obj, False)
         
         for attr in ["consult_bba", "use_bba_to_count_aces", "use_bba_to_count_keycards", 
